@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalender Libur Indonesia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 16px;
+      line-height: 1.6;
+    }
+    .box {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 16px;
+      word-break: break-all;
+    }
+    button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #2da44e;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #218739;
+    }
+    .status {
+      margin-top: 10px;
+      color: #1a7f37;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kalender Hari Libur Nasional Indonesia</h1>
+  <p>Gunakan tautan berikut untuk subscribe kalender `.ics`:</p>
+
+  <div class="box" id="icsLinkBox">
+    <a id="icsLink" href="indonesia-holidays.ics">indonesia-holidays.ics</a>
+  </div>
+
+  <button onclick="copyICSLink()">Salin tautan kalender</button>
+  <div class="status" id="status"></div>
+
+  <script>
+    function copyICSLink() {
+      const url = new URL("indonesia-holidays.ics", window.location.href).href;
+
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          document.getElementById("status").textContent = "Tautan berhasil disalin ke clipboard.";
+        })
+        .catch(() => {
+          document.getElementById("status").textContent = "Gagal menyalin otomatis. Salin manual dari tautan di atas.";
+        });
+    }
+
+    // Supaya href di halaman jadi URL penuh juga
+    const fullUrl = new URL("indonesia-holidays.ics", window.location.href).href;
+    const link = document.getElementById("icsLink");
+    link.href = fullUrl;
+    link.textContent = fullUrl;
+  </script>
+</body>
+</html>
