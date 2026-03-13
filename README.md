@@ -1,6 +1,6 @@
 # Kalender Libur Indonesia
 
-Repository ini otomatis membuat file `.ics` Hari Libur Nasional Indonesia dari data Nager.Date menggunakan GitHub Actions.
+Repository ini otomatis membuat file `.ics` Hari Libur Nasional Indonesia dari data https://www.officeholidays.com/ics-clean/indonesia menggunakan GitHub Actions.
 
 ## File kalender
 File dapat diakses di:
@@ -14,4 +14,4 @@ File dapat diakses di:
 - Reminder 1 hari sebelum acara
 
 ## Sumber data
-- https://date.nager.at
+- https://www.officeholidays.com
