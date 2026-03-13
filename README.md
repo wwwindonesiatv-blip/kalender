@@ -3,7 +3,7 @@
 Repository ini otomatis membuat file `.ics` Hari Libur Nasional Indonesia dari data Nager.Date menggunakan GitHub Actions.
 
 ## File kalender
-Setelah GitHub Pages aktif, file dapat diakses di:
+File dapat diakses di:
 
 - https://wwwindonesiatv-blip.github.io/kalender
 
