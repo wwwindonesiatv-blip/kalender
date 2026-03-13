@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 COUNTRY_CODE = "ID"
@@ -8,11 +8,30 @@ OUTPUT = Path("docs/indonesia-holidays.ics")
 
 TRANSLATIONS = {
     "New Year's Day": "Tahun Baru Masehi",
-    "Independence Day": "Hari Kemerdekaan Republik Indonesia",
-    "Christmas Day": "Hari Raya Natal",
+    "Chinese New Year": "Tahun Baru Imlek",
+    "Chinese New Year Holiday": "Tahun Baru Imlek",
+    "Isra and Mi'raj": "Isra Mikraj Nabi Muhammad SAW",
+    "Isra and Miraj": "Isra Mikraj Nabi Muhammad SAW",
+    "Balinese New Year": "Hari Suci Nyepi Tahun Baru Saka",
+    "Day of Silence": "Hari Suci Nyepi Tahun Baru Saka",
     "Good Friday": "Wafat Isa Al Masih",
+    "Eid al-Fitr": "Hari Raya Idulfitri",
+    "Eid ul-Fitr": "Hari Raya Idulfitri",
+    "Islamic New Year": "Tahun Baru Islam 1 Muharam",
+    "Muharram": "Tahun Baru Islam 1 Muharam",
     "Labour Day": "Hari Buruh Internasional",
+    "Waisak Day": "Hari Raya Waisak",
+    "Vesak Day": "Hari Raya Waisak",
     "Ascension Day of Jesus Christ": "Kenaikan Isa Al Masih",
+    "Pancasila Day": "Hari Lahir Pancasila",
+    "Eid al-Adha": "Hari Raya Iduladha",
+    "Eid ul-Adha": "Hari Raya Iduladha",
+    "Islamic New Year Holiday": "Tahun Baru Islam 1 Muharam",
+    "Independence Day": "Hari Kemerdekaan Republik Indonesia",
+    "The Prophet Muhammad's Birthday": "Maulid Nabi Muhammad SAW",
+    "Prophet Muhammad's Birthday": "Maulid Nabi Muhammad SAW",
+    "Christmas Day": "Hari Raya Natal",
+    "Ascension of the Prophet Muhammad": "Isra Mikraj Nabi Muhammad SAW",
 }
 
 def escape_ics_text(text: str) -> str:
@@ -23,24 +42,35 @@ def escape_ics_text(text: str) -> str:
             .replace("\n", r"\n")
     )
 
-def build_event(date_str, summary, description, uid_suffix):
-    start_date = datetime.strptime(date_str, "%Y-%m-%d")
-    timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+def to_indonesian_name(local_name: str, name: str) -> str:
+    candidates = [name or "", local_name or ""]
+    for item in candidates:
+        if item in TRANSLATIONS:
+            return TRANSLATIONS[item]
 
-    start_local = start_date.strftime("%Y%m%d") + "T090000"
-    end_local = start_date.strftime("%Y%m%d") + "T100000"
+    # fallback jika tidak ditemukan
+    if local_name:
+        return local_name
+    if name:
+        return name
+    return "Hari Libur"
+
+def build_event(date_str, summary, description, uid_suffix):
+    start_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    end_date = start_date + timedelta(days=1)
+    timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
 
     return [
         "BEGIN:VEVENT",
         f"UID:{start_date.strftime('%Y%m%d')}-{uid_suffix}@kalender-libur-indonesia",
         f"DTSTAMP:{timestamp}",
-        f"DTSTART;TZID=Asia/Jakarta:{start_local}",
-        f"DTEND;TZID=Asia/Jakarta:{end_local}",
+        f"DTSTART;VALUE=DATE:{start_date.strftime('%Y%m%d')}",
+        f"DTEND;VALUE=DATE:{end_date.strftime('%Y%m%d')}",
         f"SUMMARY:{escape_ics_text(summary)}",
         f"DESCRIPTION:{escape_ics_text(description)}",
         "LOCATION:Indonesia",
         "STATUS:CONFIRMED",
-        "TRANSP:OPAQUE",
+        "TRANSP:TRANSPARENT",
         "BEGIN:VALARM",
         "TRIGGER:-P1D",
         "ACTION:DISPLAY",
@@ -65,16 +95,6 @@ def main():
         "X-WR-CALNAME:Hari Libur Nasional Indonesia",
         "X-WR-TIMEZONE:Asia/Jakarta",
         "X-WR-CALDESC:Kalender otomatis hari libur nasional Indonesia",
-        "BEGIN:VTIMEZONE",
-        "TZID:Asia/Jakarta",
-        "X-LIC-LOCATION:Asia/Jakarta",
-        "BEGIN:STANDARD",
-        "TZOFFSETFROM:+0700",
-        "TZOFFSETTO:+0700",
-        "TZNAME:WIB",
-        "DTSTART:19700101T000000",
-        "END:STANDARD",
-        "END:VTIMEZONE",
     ]
 
     for year in YEARS:
@@ -88,7 +108,7 @@ def main():
 
             name = h.get("name") or ""
             local_name = h.get("localName") or ""
-            summary = TRANSLATIONS.get(name, local_name or name or "Hari Libur")
+            summary = to_indonesian_name(local_name, name)
             description = f"Hari Libur Nasional Indonesia ({year})"
 
             lines.extend(
