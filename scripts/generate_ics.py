@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 COUNTRY_CODE = "ID"
@@ -24,21 +24,23 @@ def escape_ics_text(text: str) -> str:
     )
 
 def build_event(date_str, summary, description, uid_suffix):
-    start = datetime.strptime(date_str, "%Y-%m-%d").date()
-    end = start + timedelta(days=1)
+    start_date = datetime.strptime(date_str, "%Y-%m-%d")
     timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+
+    start_local = start_date.strftime("%Y%m%d") + "T090000"
+    end_local = start_date.strftime("%Y%m%d") + "T100000"
 
     return [
         "BEGIN:VEVENT",
-        f"UID:{start.strftime('%Y%m%d')}-{uid_suffix}@kalender-libur-indonesia",
+        f"UID:{start_date.strftime('%Y%m%d')}-{uid_suffix}@kalender-libur-indonesia",
         f"DTSTAMP:{timestamp}",
-        f"DTSTART;VALUE=DATE:{start.strftime('%Y%m%d')}",
-        f"DTEND;VALUE=DATE:{end.strftime('%Y%m%d')}",
+        f"DTSTART;TZID=Asia/Jakarta:{start_local}",
+        f"DTEND;TZID=Asia/Jakarta:{end_local}",
         f"SUMMARY:{escape_ics_text(summary)}",
         f"DESCRIPTION:{escape_ics_text(description)}",
         "LOCATION:Indonesia",
         "STATUS:CONFIRMED",
-        "TRANSP:TRANSPARENT",
+        "TRANSP:OPAQUE",
         "BEGIN:VALARM",
         "TRIGGER:-P1D",
         "ACTION:DISPLAY",
@@ -63,13 +65,22 @@ def main():
         "X-WR-CALNAME:Hari Libur Nasional Indonesia",
         "X-WR-TIMEZONE:Asia/Jakarta",
         "X-WR-CALDESC:Kalender otomatis hari libur nasional Indonesia",
+        "BEGIN:VTIMEZONE",
+        "TZID:Asia/Jakarta",
+        "X-LIC-LOCATION:Asia/Jakarta",
+        "BEGIN:STANDARD",
+        "TZOFFSETFROM:+0700",
+        "TZOFFSETTO:+0700",
+        "TZNAME:WIB",
+        "DTSTART:19700101T000000",
+        "END:STANDARD",
+        "END:VTIMEZONE",
     ]
 
     for year in YEARS:
         holidays = fetch_holidays(year)
 
         for h in holidays:
-            # Filter hanya hari libur nasional/public
             if not h.get("global", True):
                 continue
             if "Public" not in h.get("types", []):
