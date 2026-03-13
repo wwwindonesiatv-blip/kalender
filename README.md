@@ -5,7 +5,7 @@ Repository ini otomatis membuat file `.ics` Hari Libur Nasional Indonesia dari d
 ## File kalender
 Setelah GitHub Pages aktif, file dapat diakses di:
 
-`https://wwwindonesiatv-blip.github.io/kalender`
+- https://wwwindonesiatv-blip.github.io/kalender
 
 ## Fitur
 - Hari libur nasional Indonesia
